@@ -42,6 +42,8 @@ import type {
   RegisteredApp,
 } from "shared";
 import { bundledAsset } from "../assets";
+import { registerUiFont, uiFontCandidates } from "../fonts";
+import { STRINGS } from "../ui/strings";
 import { CopyOnSelect, Grab, reactGrabPreloadPath } from "../grab/grab";
 import { AgentPaneFinder } from "../grab/target";
 import type { EmbeddedAgent } from "../grab/target";
@@ -223,6 +225,7 @@ class Session {
   private layout: ChromeLayout | null = null;
   private surfaceLayout: SurfaceLayout | null = null;
   private fontId = 0;
+  private fontFile = "";
 
   private shuttingDown = false;
   private devtoolsDockSide: DevtoolsDock = "bottom";
@@ -370,7 +373,12 @@ class Session {
       onQuit: () => this.shutdown(),
       onExit: (code) => this.ctx.onClose(code),
     });
-    this.fontId = await this.root.registerFont(bundledFontPath());
+    const root = this.root;
+    const font = await registerUiFont(uiFontCandidates(this.ctx.env, bundledFontPath()), (file) =>
+      root.registerFont(file),
+    );
+    this.fontId = font.id;
+    this.fontFile = font.file;
     this.settings.setNoSuper(!this.root.info.kittyKeyboard);
     this.applyRenderSettings();
     this.settings.watch();
@@ -477,10 +485,10 @@ class Session {
         stdio: tty ? "ignore" : "inherit",
         env,
       });
-      child.on("error", () => this.showToast(`Could not launch ${app.name}`, "failed"));
+      child.on("error", () => this.showToast(STRINGS.toast.couldNotLaunch(app.name), "failed"));
       child.unref();
     } catch {
-      this.showToast(`Could not launch ${app.name}`, "failed");
+      this.showToast(STRINGS.toast.couldNotLaunch(app.name), "failed");
     }
   }
 
@@ -726,7 +734,7 @@ class Session {
             return { x: surface.x, y: surface.y, width: surface.width, height: surface.height };
           },
           page: () => ({ url: tab.state.url, title: tab.state.title }),
-          fontFile: () => bundledFontPath(),
+          fontFile: () => this.fontFile || bundledFontPath(),
           requestRender: () => this.render(),
           blurToOverlay: whenActive(() => this.blurToOverlay()),
           reviewStarted: whenActive(() => this.syncRecordLayout()),
@@ -779,7 +787,7 @@ class Session {
       return true;
     }
     if (process.platform === "linux" && event.mods.ctrl && event.key === "c") {
-      this.showToast("ctrl+q to quit", "alert");
+      this.showToast(STRINGS.toast.quitHint, "alert");
       return true;
     }
     if (this.pageMenu) {
@@ -1202,7 +1210,7 @@ class Session {
     const watcher = new CopyOnSelect(handle, {
       copied: (text) => {
         this.root?.setClipboard(text);
-        this.showToast("Copied to clipboard", "done");
+        this.showToast(STRINGS.toast.copied, "done");
       },
     });
     this.copyWatchers.set(tab.id, watcher);
@@ -1241,7 +1249,7 @@ class Session {
     this.root?.setClipboard(content);
     try {
       const target = await this.agentPanes.send(content);
-      this.showToast(target ? "Sent to agent" : "Copied to clipboard", "done");
+      this.showToast(target ? STRINGS.toast.sentToAgent : STRINGS.toast.copied, "done");
     } catch (error) {
       this.showToast(error instanceof Error ? error.message : String(error), "failed");
     }
@@ -1250,7 +1258,7 @@ class Session {
   private grabMenuItem(): PageMenuItem {
     return {
       id: "grab",
-      label: this.activeGrab()?.active ? "Stop selection" : "Send to agent",
+      label: this.activeGrab()?.active ? STRINGS.menu.stopSelection : STRINGS.menu.sendToAgent,
       enabled: true,
       shortcut: this.keymap.label("grab.toggle"),
       icon: { kind: "path", d: ICONS.select },
@@ -1261,14 +1269,14 @@ class Session {
     return [
       {
         id: "record",
-        label: this.activeRecord() ? "Complete recording" : "Record",
+        label: this.activeRecord() ? STRINGS.menu.completeRecording : STRINGS.menu.record,
         enabled: true,
         shortcut: this.activeRecord() ? "" : this.keymap.label("record.toggle"),
         icon: { kind: "path", d: ICONS.record, tint: "red", weight: 8 },
       },
       {
         id: "inspect",
-        label: "Inspect",
+        label: STRINGS.menu.inspect,
         enabled: true,
         shortcut: this.keymap.label("devtools.toggle"),
         icon: this.inspectIcon ? { kind: "image", src: this.inspectIcon } : undefined,
@@ -1292,7 +1300,7 @@ class Session {
 
   private paneMenuItems(): PageMenuItem[] {
     if (!this.closablePane) return [];
-    return [{ id: "close-pane", label: "关闭窗格", enabled: true, shortcut: "" }];
+    return [{ id: "close-pane", label: STRINGS.menu.closePane, enabled: true, shortcut: "" }];
   }
 
   private async closePane() {
@@ -1315,7 +1323,7 @@ class Session {
         ? [
             {
               id: "copy",
-              label: "Copy",
+              label: STRINGS.menu.copy,
               enabled: true,
               shortcut: process.platform === "darwin" ? "cmd+c" : "ctrl+c",
             },
@@ -1323,8 +1331,8 @@ class Session {
         : []),
       ...(this.pageMenu.linkURL
         ? [
-            { id: "open-link-tab", label: "Open link in new tab", enabled: true, shortcut: "" },
-            { id: "copy-link", label: "Copy link address", enabled: true, shortcut: "" },
+            { id: "open-link-tab", label: STRINGS.menu.openLinkInNewTab, enabled: true, shortcut: "" },
+            { id: "copy-link", label: STRINGS.menu.copyLinkAddress, enabled: true, shortcut: "" },
           ]
         : []),
       this.grabMenuItem(),
@@ -1473,6 +1481,7 @@ class Session {
     const command = (id: CommandId): PaletteAction => ({
       id,
       label: this.paletteLabel(id),
+      keywords: commandLabel(id),
       shortcut: this.paletteShortcut(id),
       run: () => this.runCommand(id),
     });
@@ -1509,8 +1518,8 @@ class Session {
               id: "devtools-dock",
               label:
                 this.devtoolsDockSide === "bottom"
-                  ? "Dock devtools right"
-                  : "Dock devtools bottom",
+                  ? STRINGS.palette.dockDevtoolsRight
+                  : STRINGS.palette.dockDevtoolsBottom,
               shortcut: "",
               run: () =>
                 this.setDevtoolsDockSide(this.devtoolsDockSide === "bottom" ? "right" : "bottom"),
@@ -1540,13 +1549,13 @@ class Session {
     switch (id) {
       case "record.toggle": {
         const record = this.activeRecord();
-        if (!record) return "Record page";
-        return record.reviewing ? "Complete recording" : "Stop recording";
+        if (!record) return STRINGS.palette.recordPage;
+        return record.reviewing ? STRINGS.palette.completeRecording : STRINGS.palette.stopRecording;
       }
       case "grab.toggle":
-        return this.activeGrab()?.active ? "Stop selection" : "Send to agent";
+        return this.activeGrab()?.active ? STRINGS.palette.stopSelection : STRINGS.palette.sendToAgent;
       case "devtools.toggle":
-        return this.tabs.active?.devtools ? "Close devtools" : "Open devtools";
+        return this.tabs.active?.devtools ? STRINGS.palette.closeDevtools : STRINGS.palette.openDevtools;
       default:
         return commandLabel(id);
     }
@@ -1560,7 +1569,9 @@ class Session {
   private filteredPalette(): PaletteAction[] {
     if (!this.palette) return [];
     const query = this.palette.query.toLowerCase();
-    return this.paletteActions().filter((action) => action.label.toLowerCase().includes(query));
+    return this.paletteActions().filter((action) =>
+      `${action.label} ${action.keywords ?? ""}`.toLowerCase().includes(query),
+    );
   }
 
   private recalculateLayout(placement: DevtoolsPlacement | null = this.devtoolsPlacement()) {
@@ -1611,6 +1622,7 @@ class Session {
 interface PaletteAction {
   id: string;
   label: string;
+  keywords?: string;
   shortcut: string;
   run(): void;
 }
