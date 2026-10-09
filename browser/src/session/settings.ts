@@ -25,6 +25,7 @@ import type {
   ShortcutOverrides,
 } from "shared";
 import { bundledAsset } from "../assets";
+import { STRINGS } from "../ui/strings";
 import type { ReleaseView, SettingRow, SettingsActions, SettingsSection, SettingsView } from "../ui/types";
 
 export interface SettingsHost {
@@ -49,13 +50,14 @@ function settingRow(key: SettingKey, value: string): SettingRow {
   const base = {
     key,
     group: def.group,
-    label: def.label,
-    hint: def.hint,
+    label: STRINGS.settings.items[key].label,
+    hint: STRINGS.settings.items[key].hint,
     modified: value !== def.default,
   };
   if (!def.choices) return { ...base, kind: "string", value };
   const choices = def.choices.map((choice) => ({
     ...choice,
+    name: STRINGS.settings.choices[choice.value] ?? choice.name,
     logo: choice.logo ? bundledAsset(choice.logo) : null,
   }));
   const values = def.choices.map((choice) => choice.value);
@@ -131,7 +133,7 @@ export class SettingsManager {
     if (loaded.settings) this.host.settingsChanged();
     this.host.requestRender();
     if (loaded.errors.length) this.host.toast(loaded.errors[0], "failed");
-    else if (announce) this.host.toast("Config reloaded", "done");
+    else if (announce) this.host.toast(STRINGS.toast.configReloaded, "done");
   }
 
   watch() {
@@ -221,11 +223,11 @@ export class SettingsManager {
     reloadConfig: () => this.reload(true),
     copyAgentBrief: () => {
       this.host.setClipboard(agentBrief(this.config.files));
-      this.host.toast("Copied to clipboard", "done");
+      this.host.toast(STRINGS.toast.copied, "done");
     },
     copyPath: (file) => {
       this.host.setClipboard(this.config.files[file]);
-      this.host.toast("Copied to clipboard", "done");
+      this.host.toast(STRINGS.toast.copied, "done");
     },
   };
 
@@ -238,15 +240,16 @@ export class SettingsManager {
       .all()
       .map((binding) => ({
         id: binding.id,
-        label: commandLabel(binding.id),
+        label: STRINGS.commands[binding.id],
         keys: this.map.labels(binding.id),
         modified: binding.modified,
-        conflicts: this.map.conflicts(binding.id).map(commandLabel),
+        conflicts: this.map.conflicts(binding.id).map((id) => STRINGS.commands[id]),
       }))
       .filter(
         (row) =>
           !query ||
           row.label.toLowerCase().includes(query) ||
+          (isCommandId(row.id) && commandLabel(row.id).toLowerCase().includes(query)) ||
           row.id.includes(query) ||
           row.keys.some((key) => key.includes(keyQuery)),
       );
@@ -255,7 +258,7 @@ export class SettingsManager {
       query: modal.query,
       recording: modal.recording && {
         id: modal.recording.id,
-        label: commandLabel(modal.recording.id),
+        label: STRINGS.commands[modal.recording.id],
         keys: modal.recording.chord ? formatChord(modal.recording.chord) : "",
       },
       shortcuts,

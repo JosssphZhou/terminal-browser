@@ -5,6 +5,7 @@ import { Icon } from "../icons";
 import { mix, withAlpha } from "../theme";
 import type { Theme } from "../theme";
 import type { SettingChoiceView } from "../types";
+import { STRINGS } from "../strings";
 
 const ITEM_HEIGHT_REMS = 2.1;
 const MENU_ITEM_HEIGHT_REMS = 1.9;
@@ -13,7 +14,7 @@ const MENU_PADDING_REMS = 0.2;
 export const CUSTOM = "custom";
 
 export function withCustom(choices: SettingChoiceView[]): SettingChoiceView[] {
-  return [...choices, { value: CUSTOM, name: "Custom", logo: null }];
+  return [...choices, { value: CUSTOM, name: STRINGS.settings.custom, logo: null }];
 }
 
 export interface OpenDropdown {

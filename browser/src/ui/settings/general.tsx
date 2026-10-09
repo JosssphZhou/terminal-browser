@@ -9,7 +9,7 @@ import { IconButton, Toggle } from "./controls";
 import { CUSTOM, Dropdown, withCustom } from "./dropdown";
 import type { OpenDropdown } from "./dropdown";
 import { PANE_PADDING_REMS } from "./index";
-import { copy } from "./copy";
+import { STRINGS } from "../strings";
 import { ConfigFiles } from "./config-files";
 
 export function GeneralPane({
@@ -73,13 +73,13 @@ function VersionLine({ release, rem, theme }: { release: ReleaseView; rem: numbe
     >
       <Box style={{ alignItems: "center", gap: rem * 0.6 }}>
         <Text style={{ flexGrow: 1, flexBasis: 0, fontSize: rem * 1, wrap: false, selectable: false }}>
-          {copy.version}
+          {STRINGS.settings.version}
         </Text>
         <Text style={{ fontSize: rem * 0.9, color: theme.muted, wrap: false, selectable: true }}>{release.version}</Text>
       </Box>
       {release.latest && (
         <Text style={{ fontSize: rem * 0.85, color: theme.green, selectable: false }}>
-          {copy.update(release.latest, release.upgrade)}
+          {STRINGS.settings.update(release.latest, release.upgrade)}
         </Text>
       )}
     </Box>

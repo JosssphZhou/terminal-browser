@@ -7,6 +7,7 @@ import { buildSampleTimes } from "./samples";
 import { lastIndexAtOrBefore } from "./recorder";
 import type { MarkupStore } from "./model";
 import type { Recorder } from "./recorder";
+import { STRINGS } from "../ui/strings";
 
 export interface Keyframe {
   frame: number;
@@ -84,7 +85,7 @@ export function writeFailedManifest(dir: string, page: { url: string; title: str
 export async function compositeRecording(options: CompositeOptions): Promise<void> {
   const { recorder, markup, page, trim } = options;
   const frames = recorder.frames;
-  if (frames.length === 0) throw new Error("Nothing captured");
+  if (frames.length === 0) throw new Error(STRINGS.toast.nothingCaptured);
   const dir = recorder.dir;
 
   const trimStart = trim?.startMs ?? 0;

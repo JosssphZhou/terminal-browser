@@ -1,7 +1,7 @@
 import { Box, Text } from "@zenbu-labs/pixel";
 import type { Theme } from "../theme";
 import type { SettingsActions, SettingsView } from "../types";
-import { copy } from "./copy";
+import { STRINGS } from "../strings";
 import { TextButton } from "./controls";
 import { CopyIcon, useCopiedFlash } from "./copied";
 import { PANE_PADDING_REMS } from "./index";
@@ -25,7 +25,7 @@ export function ConfigFiles({
         padding: { top: rem * 1.1, left: rem * PANE_PADDING_REMS, right: rem * PANE_PADDING_REMS },
       }}
     >
-      <Text style={{ fontSize: rem * 1, wrap: false, selectable: false }}>{copy.configFiles}</Text>
+      <Text style={{ fontSize: rem * 1, wrap: false, selectable: false }}>{STRINGS.settings.configFiles}</Text>
       <PathLine
         path={view.files.settings}
         rem={rem}
@@ -39,7 +39,7 @@ export function ConfigFiles({
         onCopy={() => actions.copyPath("shortcuts")}
       />
       <Box style={{ margin: { top: rem * 0.3 } }}>
-        <TextButton label={copy.reload} rem={rem} theme={theme} onClick={actions.reloadConfig} />
+        <TextButton label={STRINGS.settings.reload} rem={rem} theme={theme} onClick={actions.reloadConfig} />
       </Box>
     </Box>
   );

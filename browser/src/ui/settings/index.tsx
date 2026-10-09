@@ -5,7 +5,7 @@ import { Icon } from "../icons";
 import type { IconName } from "../icons";
 import type { Theme } from "../theme";
 import type { ChromeLayout, SettingsActions, SettingsSection, SettingsView } from "../types";
-import { copy } from "./copy";
+import { STRINGS } from "../strings";
 import { RecordDialog } from "./record-dialog";
 import { AgentBriefButton } from "./agent-brief-button";
 import { IconButton } from "./controls";
@@ -114,7 +114,7 @@ export function SettingsCard({
                       selectable: false,
                     }}
                   >
-                    {copy.sections[section]}
+                    {STRINGS.settings.sections[section]}
                   </Text>
                 </Box>
               );
@@ -126,7 +126,7 @@ export function SettingsCard({
           </Box>
         </Box>
         <Box style={{ flexGrow: 1, flexBasis: 0, minWidth: 0, flexDirection: "column" }}>
-          <PaneHeader title={copy.sections[view.section]} rem={rem} theme={theme} onClose={actions.close} />
+          <PaneHeader title={STRINGS.settings.sections[view.section]} rem={rem} theme={theme} onClose={actions.close} />
           {view.section === "shortcuts" ? (
             <ShortcutsPane view={view} actions={actions} rem={rem} theme={theme} />
           ) : (

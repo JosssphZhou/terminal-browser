@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Icon } from "../icons";
 import type { Theme } from "../theme";
-import { copy } from "./copy";
 
 const COPIED_FLASH_MS = 1500;
 

@@ -5,7 +5,7 @@ import { Icon } from "../icons";
 import { withAlpha } from "../theme";
 import type { Theme } from "../theme";
 import type { SettingsActions, SettingsView, ShortcutRow } from "../types";
-import { copy } from "./copy";
+import { STRINGS } from "../strings";
 import { ScrollPane } from "./scroll-pane";
 import { IconButton } from "./controls";
 import { PANE_PADDING_REMS } from "./index";
@@ -68,7 +68,7 @@ export function ShortcutsPane({
               selectable: false,
             }}
           >
-            {copy.noMatches}
+            {STRINGS.settings.noMatches}
           </Text>
         )}
         {view.shortcuts.map((row) => (
@@ -130,11 +130,11 @@ function ShortcutLine({
         <Text
           style={{ fontSize: rem * 0.75, color: theme.yellow, wrap: false, selectable: false }}
         >
-          {copy.conflict(row.conflicts)}
+          {STRINGS.settings.conflict(row.conflicts)}
         </Text>
       )}
       {row.keys.length === 0 ? (
-        <Chip text={copy.unbound} tone="muted" rem={rem} theme={theme} onClick={toggleRecord} />
+        <Chip text={STRINGS.settings.unbound} tone="muted" rem={rem} theme={theme} onClick={toggleRecord} />
       ) : (
         row.keys.map((key) => (
           <Chip

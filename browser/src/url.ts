@@ -2,6 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { STRINGS } from "./ui/strings";
 
 function localFile(input: string, cwd?: string): string | null {
   const expanded =
@@ -53,7 +54,7 @@ const HAS_AUTHORITY = /^[a-z][a-z0-9+.-]*:\/\//i;
 const SCHEMES_WITHOUT_HOST = /^(?:data|mailto|tel|about|blob|chrome|view-source):/i;
 
 export function displayUrl(url: string): string {
-  if (!url || url === "about:blank") return "New tab";
+  if (!url || url === "about:blank") return STRINGS.tabs.newTab;
   if (url.startsWith("file://")) return homeRelative(url);
   return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
 }

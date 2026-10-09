@@ -2,7 +2,7 @@ import { Box, Text } from "@zenbu-labs/pixel";
 import { Backdrop } from "../modals";
 import type { Theme } from "../theme";
 import type { ChromeLayout } from "../types";
-import { copy } from "./copy";
+import { STRINGS } from "../strings";
 
 export function RecordDialog({
   keys,
@@ -44,7 +44,7 @@ export function RecordDialog({
         onWheel={() => {}}
       >
         <Text style={{ fontSize: rem * 0.92, wrap: false, selectable: false }}>
-          {copy.recordPrompt}
+          {STRINGS.settings.recordPrompt}
         </Text>
         <Box
           style={{

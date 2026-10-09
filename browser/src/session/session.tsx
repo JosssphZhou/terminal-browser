@@ -1289,7 +1289,7 @@ class Session {
       ...this.toolMenuItems(),
       {
         id: "settings",
-        label: commandLabel("settings.open"),
+        label: STRINGS.commands["settings.open"],
         enabled: true,
         shortcut: this.keymap.label("settings.open"),
         icon: { kind: "path", d: ICONS.settings },
@@ -1557,7 +1557,7 @@ class Session {
       case "devtools.toggle":
         return this.tabs.active?.devtools ? STRINGS.palette.closeDevtools : STRINGS.palette.openDevtools;
       default:
-        return commandLabel(id);
+        return STRINGS.commands[id];
     }
   }
 

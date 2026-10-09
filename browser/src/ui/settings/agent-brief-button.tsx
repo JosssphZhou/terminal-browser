@@ -1,6 +1,6 @@
 import { Box, Text } from "@zenbu-labs/pixel";
 import type { Theme } from "../theme";
-import { copy } from "./copy";
+import { STRINGS } from "../strings";
 import { CopyIcon, useCopiedFlash } from "./copied";
 
 export function AgentBriefButton({
@@ -38,7 +38,7 @@ export function AgentBriefButton({
           selectable: false,
         }}
       >
-        {copy.agent}
+        {STRINGS.settings.agent}
       </Text>
       <CopyIcon copied={copied} size={rem * 0.95} theme={theme} />
     </Box>

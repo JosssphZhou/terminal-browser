@@ -1,3 +1,13 @@
+import os from "node:os";
+import path from "node:path";
+
+import { ENGINE_LOG_FILE } from "shared";
+import type { CommandId, SettingKey } from "shared";
+
+import type { SettingsSection } from "./types";
+
+const ENGINE_LOG_FILE_SHORT = ENGINE_LOG_FILE.replace(os.homedir() + path.sep, "~" + path.sep);
+
 // Every piece of text the browser shows to the person using it lives here.
 // Command-line flags, logs and output meant for agents stay in English and are not listed.
 export const STRINGS = {
@@ -13,7 +23,6 @@ export const STRINGS = {
     closePane: "关闭窗格",
   },
   palette: {
-    findInPage: "在页面中查找",
     recordPage: "录制页面",
     stopRecording: "停止录制",
     completeRecording: "完成录制",
@@ -23,7 +32,6 @@ export const STRINGS = {
     closeDevtools: "关闭开发者工具",
     dockDevtoolsRight: "开发者工具停靠在右侧",
     dockDevtoolsBottom: "开发者工具停靠在底部",
-    openApp: (name: string) => `打开 ${name}`,
     noMatches: "没有匹配的操作",
   },
   tabs: {
@@ -38,6 +46,7 @@ export const STRINGS = {
     copied: "已复制到剪贴板",
     sentToAgent: "已发送给 agent",
     quitHint: "按 ctrl+q 退出",
+    configReloaded: "已重新加载配置",
     couldNotLaunch: (name: string) => `无法启动 ${name}`,
     recordingCapped: (minutes: number) => `录制已达到 ${minutes} 分钟上限`,
     nothingCaptured: "没有录到任何画面",
@@ -63,5 +72,70 @@ export const STRINGS = {
     screenshot: "截图",
     cropFrame: "裁剪当前帧",
     cropVideo: "裁剪整段视频",
+  },
+  commands: {
+    palette: "命令面板",
+    "settings.open": "设置",
+    "tab.new": "新建标签页",
+    "tab.close": "关闭标签页",
+    "url.edit": "编辑网址",
+    find: "在页面中查找",
+    "page.reload": "重新加载页面",
+    "page.back": "后退",
+    "page.forward": "前进",
+    "devtools.toggle": "打开或关闭开发者工具",
+    "devtools.console": "开发者工具控制台",
+    "record.toggle": "录制页面",
+    "grab.toggle": "发送给 agent",
+    "zoom.in": "放大",
+    "zoom.out": "缩小",
+    "zoom.reset": "重置缩放",
+    "ui.zoom.in": "放大界面",
+    "ui.zoom.out": "缩小界面",
+    "ui.zoom.reset": "重置界面缩放",
+    quit: "退出",
+  } satisfies Record<CommandId, string>,
+  settings: {
+    sections: {
+      general: "通用",
+      shortcuts: "快捷键",
+      advanced: "高级",
+    } satisfies Record<SettingsSection, string>,
+    noMatches: "没有匹配的快捷键",
+    recordPrompt: "按下想要的组合键，然后按 Enter。",
+    unbound: "未设置",
+    conflict: (labels: string[]) => `同时用于：${labels.join("、")}`,
+    reload: "重新加载配置",
+    agent: "让 agent 来配置",
+    version: "版本",
+    update: (version: string, command: string) => `${version} 已发布，运行 ${command} 升级`,
+    configFiles: "配置文件",
+    custom: "自定义",
+    items: {
+      "search.engine": { label: "搜索引擎", hint: "搜索时默认使用的搜索引擎。" },
+      "search.suggestions": { label: "搜索建议", hint: "提供自动补全建议的服务。" },
+      "telemetry.usage": { label: "关闭匿名使用统计", hint: "只记录少量匿名事件，用来改进这个项目。" },
+      "telemetry.crashReports": { label: "关闭崩溃报告", hint: "崩溃报告用来改进这个项目，避免以后再次崩溃。" },
+      "updates.check": { label: "关闭更新检查", hint: "不再联网检查 terminal-browser 是否有新版本。" },
+      "render.fps": { label: "帧率", hint: "画面每秒最多刷新的次数。" },
+      "render.presenter": { label: "图像传输格式", hint: "把画面像素传给终端时使用的格式。对新窗口生效。" },
+      "render.transport": { label: "帧传输方式", hint: "把画面像素传给终端的方式。对新窗口生效。" },
+      "render.frameEvents": { label: "显示调试动作", hint: "在浏览器顶部叠加显示内部调试信息。" },
+      "render.transmitOutlines": { label: "高亮更新区域", hint: "在每张新发送到终端的图像周围画一圈边框。" },
+      "debug.logFile": { label: "启用日志", hint: `把内部日志写入 ${ENGINE_LOG_FILE_SHORT}` },
+    } satisfies Record<SettingKey, { label: string; hint: string }>,
+    choices: {
+      on: "开",
+      off: "关闭",
+      display: "跟随显示器",
+      uncapped: "不限制",
+      auto: "自动",
+      full: "整帧",
+      patched: "局部更新",
+      animation: "Kitty 动画",
+      shared: "共享内存",
+      file: "文件",
+      inline: "内嵌",
+    } as Record<string, string>,
   },
 };
